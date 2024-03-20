@@ -1,0 +1,14 @@
+inputSet:
+  name: inputset
+  identifier: inputset
+  orgIdentifier: DEMO
+  projectIdentifier: ACME
+  pipeline:
+    identifier: deployecsservice
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
