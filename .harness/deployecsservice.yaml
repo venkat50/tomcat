@@ -1,0 +1,122 @@
+pipeline:
+  name: deploy-ecs-service
+  identifier: deployecsservice
+  projectIdentifier: ACME
+  orgIdentifier: DEMO
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.venkat50
+        repoName: tomcat
+        build: <+input>
+  stages:
+    - stage:
+        name: build
+        identifier: build
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: k3ssa
+              namespace: harness-build
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: RunTests
+                  name: RunTests
+                  identifier: RunTests
+                  spec:
+                    connectorRef: org.Docker
+                    image: maven:3.8.6-jdk-8
+                    language: Java
+                    buildTool: Maven
+                    args: clean test package
+                    runOnlySelectedTests: true
+                    preCommand: cd wicket-app
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths:
+                          - "**/target/surefire-reports/*.xml"
+                    enableTestSplitting: false
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: BuildAndPushDockerRegistry
+                  identifier: BuildAndPushDockerRegistry
+                  spec:
+                    connectorRef: awsecr
+                    repo: 915632791698.dkr.ecr.us-east-1.amazonaws.com/venkat-ecr
+                    tags:
+                      - 1.<+pipeline.sequenceId>
+                    dockerfile: wicket-app/Dockerfile
+                    context: /harness
+          caching:
+            enabled: false
+            paths: []
+    - stage:
+        name: deploy
+        identifier: deploy
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: ECS
+          service:
+            serviceRef: wicketapp
+            serviceInputs:
+              serviceDefinition:
+                type: ECS
+                spec:
+                  artifacts:
+                    primary:
+                      primaryArtifactRef: venkatecr
+                      sources:
+                        - identifier: venkatecr
+                          type: Ecr
+                          spec:
+                            tag: 1.<+pipeline.sequenceId>
+          environment:
+            environmentRef: DEV
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: fargate
+          execution:
+            steps:
+              - stepGroup:
+                  name: Basic Deployment
+                  identifier: basicDepoyment
+                  steps:
+                    - step:
+                        name: ECS Service Setup
+                        identifier: EcsServiceSetup
+                        type: EcsServiceSetup
+                        timeout: 10m
+                        spec: {}
+                    - step:
+                        name: ECS Upgrade Container
+                        identifier: EcsUpgradeContainer
+                        type: EcsUpgradeContainer
+                        timeout: 10m
+                        spec:
+                          newServiceInstanceCount: 100
+                          newServiceInstanceUnit: Percentage
+            rollbackSteps:
+              - step:
+                  name: ECS Basic Rollback
+                  identifier: EcsBasicRollback
+                  type: EcsBasicRollback
+                  timeout: 10m
+                  spec: {}
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
