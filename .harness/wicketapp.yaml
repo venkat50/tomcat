@@ -1,0 +1,47 @@
+service:
+  name: wicket-app
+  identifier: wicketapp
+  orgIdentifier: DEMO
+  projectIdentifier: ACME
+  serviceDefinition:
+    spec:
+      artifacts:
+        primary:
+          primaryArtifactRef: <+input>
+          sources:
+            - spec:
+                connectorRef: awscs
+                imagePath: venkat-ecr
+                tag: <+input>
+                digest: ""
+                region: us-east-1
+              identifier: venkatecr
+              type: Ecr
+      manifests:
+        - manifest:
+            identifier: task
+            type: EcsTaskDefinition
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: account.venkat50
+                  gitFetchType: Branch
+                  paths:
+                    - wicket-app/taskdefinition.json
+                  repoName: tomcat
+                  branch: main
+        - manifest:
+            identifier: svc
+            type: EcsServiceDefinition
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: account.venkat50
+                  gitFetchType: Branch
+                  paths:
+                    - wicket-app/ecs-service.json
+                  repoName: tomcat
+                  branch: main
+    type: ECS
