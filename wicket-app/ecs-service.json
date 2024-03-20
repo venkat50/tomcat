@@ -1,0 +1,28 @@
+{
+    "launchType": "FARGATE",
+    "serviceName": "app1-service",
+    "desiredCount": 1,
+    "networkConfiguration": {
+        "awsvpcConfiguration": {
+            "subnets": [
+                "subnet-05c50fe879bc28c7d",
+                "subnet-7e83df50",
+                "subnet-b14918d6",
+                "subnet-07554740fea5da269",
+                "subnet-5dfb9e63",
+                "subnet-80a6f4dc",
+                "subnet-543edf19",
+                "subnet-0ac5ce05",
+                "subnet-0ec05398ef467e0af"
+            ],
+            "securityGroups": [
+                "sg-f24295a8"
+            ],
+            "assignPublicIp": "ENABLED"
+        }
+    },
+    "deploymentConfiguration": {
+        "maximumPercent": 100,
+        "minimumHealthyPercent": 0
+    }
+}
