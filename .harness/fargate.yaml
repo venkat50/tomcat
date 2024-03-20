@@ -1,0 +1,13 @@
+infrastructureDefinition:
+  name: fargate
+  identifier: fargate
+  orgIdentifier: DEMO
+  projectIdentifier: ACME
+  environmentRef: DEV
+  deploymentType: ECS
+  type: ECS
+  spec:
+    connectorRef: awscs
+    region: us-east-1
+    cluster: venkat-fargate-cluster
+  allowSimultaneousDeployments: false
