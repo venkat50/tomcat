@@ -1,0 +1,30 @@
+trigger:
+  name: push-trigger
+  identifier: pushtrigger
+  enabled: true
+  encryptedWebhookSecretIdentifier: ""
+  description: ""
+  tags: {}
+  orgIdentifier: DEMO
+  stagesToExecute: []
+  projectIdentifier: ACME
+  pipelineIdentifier: deployecsservice
+  source:
+    type: Webhook
+    spec:
+      type: Github
+      spec:
+        type: Push
+        spec:
+          connectorRef: account.venkat50
+          autoAbortPreviousExecutions: true
+          payloadConditions:
+            - key: targetBranch
+              operator: Equals
+              value: main
+          headerConditions: []
+          repoName: tomcat
+          actions: []
+  pipelineBranchName: <+trigger.branch>
+  inputSetRefs:
+    - inputset
