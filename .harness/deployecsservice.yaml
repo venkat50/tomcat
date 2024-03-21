@@ -57,6 +57,17 @@ pipeline:
                       - 1.<+pipeline.sequenceId>
                     dockerfile: wicket-app/Dockerfile
                     context: /harness
+              - step:
+                  type: BuildAndPushECR
+                  name: BuildAndPushECR
+                  identifier: BuildAndPushECR
+                  spec:
+                    connectorRef: awscs
+                    region: us-east-1
+                    account: "915632791698"
+                    imageName: venkat-ecr
+                    tags:
+                      - 1.<+pipeline.sequenceId>
           caching:
             enabled: false
             paths: []
