@@ -68,6 +68,8 @@ pipeline:
                     imageName: venkat-ecr
                     tags:
                       - 1.<+pipeline.sequenceId>
+                    dockerfile: wicket-app/Dockerfile
+                    context: /harness
           caching:
             enabled: false
             paths: []
