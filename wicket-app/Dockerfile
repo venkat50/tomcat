@@ -1,4 +1,4 @@
-FROM tomcat:8.5.21-alpine
+FROM tomcat:8.5.24-alpine
 ADD wicket-app/target/wicket-app-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/
 RUN mv /usr/local/tomcat/webapps/wicket-app-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/wicket-app.war
 EXPOSE 8080
